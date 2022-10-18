@@ -1,5 +1,8 @@
 import { Response } from 'express';
-import { ExpressErrorResponse } from '../types/GenericTypes';
+import fs from 'fs';
+import path from 'path';
+import { PLATFORMS } from '../app_config';
+import { ExpressErrorResponse, GamePathDetails } from '../types/GenericTypes';
 
 export const handleCaughtError = (error: ExpressErrorResponse | any, res?: Response) => {
 	if (res) {
@@ -13,4 +16,32 @@ export const handleCaughtError = (error: ExpressErrorResponse | any, res?: Respo
 		console.log(error);
 		return;
 	}
+};
+
+export const buildGamePaths = (): GamePathDetails[] => {
+	const gamePaths: GamePathDetails[] = [];
+	let currentPath: string;
+
+	const isValidPath = (filePath: string) =>
+		typeof filePath === 'string' && fs.statSync(path.resolve(filePath)).isDirectory();
+
+	// GameCube
+	currentPath = process.env.NINTENDO_GAMECUBE_PATH as string;
+	if (isValidPath(currentPath)) {
+		gamePaths.push({
+			path: path.resolve(currentPath),
+			platform: PLATFORMS.nintendo_gamecube
+		});
+	}
+
+	// Wii
+	currentPath = process.env.NINTENDO_WII_PATH as string;
+	if (isValidPath(currentPath)) {
+		gamePaths.push({
+			path: path.resolve(currentPath),
+			platform: PLATFORMS.nintendo_wii
+		});
+	}
+
+	return gamePaths;
 };
