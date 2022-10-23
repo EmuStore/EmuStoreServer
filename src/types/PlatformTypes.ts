@@ -1,14 +1,4 @@
-export type ExpressErrorResponse = {
-	status: number;
-	message: string;
-};
-
-export type GamePathDetails = {
-	path: string;
-	platform: Platforms;
-};
-
-export type Platforms =
+export type Platform =
 	| 'atari_2600'
 	| 'atari_7800'
 	| 'atari_jaguar'
@@ -20,7 +10,7 @@ export type Platforms =
 	| 'nintendo_3ds'
 	| 'nintendo_64'
 	| 'nintendo_ds'
-	| 'nes'
+	| 'nintendo_entertainment_system'
 	| 'nintendo_gameboy'
 	| 'nintendo_gameboy_advance'
 	| 'nintendo_gameboy_color'
@@ -38,10 +28,6 @@ export type Platforms =
 	| 'sony_playstation'
 	| 'sony_playstation2'
 	| 'sony_psp'
-	| 'snes'
+	| 'super_nintendo_entertainment_system'
 	| 'turbografx_16'
 	| 'watara_supervision';
-
-export type Platform = Record<Platforms, Platforms>;
-
-export type PlatformExtensions = Record<Platforms, string[]>;

@@ -4,6 +4,24 @@ import { handleCaughtError } from '../utilities/functions';
 
 const router = Router();
 
+router.get('/list', async (_req: Request, res: Response) => {
+	try {
+		const GS = new GameService();
+		return await GS.getAllGames(res);
+	} catch (error) {
+		handleCaughtError(error, res);
+	}
+});
+
+router.post('/download', async (req: Request, res: Response) => {
+	try {
+		const GS = new GameService();
+		return await GS.sendGame(req, res);
+	} catch (error) {
+		handleCaughtError(error, res);
+	}
+});
+
 router.get('/scan', async (_req: Request, res: Response) => {
 	try {
 		const GS = new GameService();

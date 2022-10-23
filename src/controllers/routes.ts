@@ -6,7 +6,7 @@ import GameController from './GameController';
 
 const router = Router();
 
-router.use('/games', GameController);
+router.use('/game', GameController);
 
 router.use((_req: Request, res: Response) =>
 	handleCaughtError(RESPONSES.generic.notFound, res)

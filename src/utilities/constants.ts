@@ -13,6 +13,23 @@ export const RESPONSES = {
 			message: 'You are not authorized to access that resource.'
 		}
 	},
+	game: {
+		gamePathNotFound: {
+			status: 500,
+			message:
+				'Either the path to the requested game either is incorrect or the game file has been moved.'
+		},
+		invalidGameName: {
+			status: 400,
+			message:
+				'`name` is required in the request body and must be a non-empty string.'
+		},
+		invalidGamePlatform: {
+			status: 400,
+			message:
+				'`platform` is required in the request body and must be a non-empty string.'
+		}
+	},
 	generic: {
 		databaseConnectionError: {
 			status: 500,

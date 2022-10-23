@@ -1,12 +1,53 @@
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import fs from 'fs';
 import path from 'path';
-import { PLATFORM_FILE_EXTENSIONS } from '../app_config';
+import buildGamePaths from '../configuration/platforms';
 import { DB } from '../connectors/sequelize';
 import { RESPONSES } from '../utilities/constants';
-import { buildGamePaths } from '../utilities/functions';
+import { validString } from '../utilities/functions';
 
 export class GameService {
+	public async getAllGames(res: Response) {
+		const sequelize = await DB.getConnection();
+		if (!sequelize) {
+			throw RESPONSES.generic.databaseConnectionError;
+		}
+		const { models } = sequelize;
+		const games = await models.Game.findAll({
+			attributes: ['name', 'platform', 'size']
+		});
+		res.send(games);
+	}
+
+	public async sendGame(req: Request, res: Response) {
+		const { name, platform } = req.body;
+		if (!validString(name)) {
+			throw RESPONSES.game.invalidGameName;
+		}
+		if (!validString(platform)) {
+			throw RESPONSES.game.invalidGameName;
+		}
+		const sequelize = await DB.getConnection();
+		if (!sequelize) {
+			throw RESPONSES.generic.databaseConnectionError;
+		}
+		const { models } = sequelize;
+		const game = await models.Game.findOne({
+			where: {
+				name: name as string,
+				platform: platform as string
+			}
+		});
+		if (!game) {
+			throw RESPONSES.generic.notFound;
+		}
+		if (!fs.existsSync(game.path) || !fs.statSync(game.path).isFile()) {
+			throw RESPONSES.game.gamePathNotFound;
+		}
+		const stream = fs.createReadStream(game.path);
+		stream.pipe(res);
+	}
+
 	public async scanGames(res: Response) {
 		const sequelize = await DB.getConnection();
 		if (!sequelize) {
@@ -21,11 +62,10 @@ export class GameService {
 			for (let j = 0; j < files.length; j++) {
 				const fileName = files[j];
 				const fullPath = path.resolve(`${gamePathObj.path}/${fileName}`);
-				const validExtensions = PLATFORM_FILE_EXTENSIONS[gamePathObj.platform];
 				let fileNameWithoutExtension = fileName;
 				let validFile = false;
-				validExtensions.forEach((ext) => {
-					if (fs.statSync(fullPath).isFile()) {
+				if (fs.statSync(fullPath).isFile()) {
+					gamePathObj.extensions.forEach((ext) => {
 						if (fileName.endsWith(ext.toLowerCase())) {
 							validFile = true;
 							fileNameWithoutExtension = fileName.replace(
@@ -39,8 +79,10 @@ export class GameService {
 								''
 							);
 						}
-					}
-				});
+					});
+				} else {
+					validFile = false;
+				}
 				if (!validFile) continue;
 				const fileSize = fs.statSync(fullPath).size;
 				await models.Game.create({

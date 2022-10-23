@@ -1,8 +1,7 @@
 import { Response } from 'express';
 import fs from 'fs';
 import path from 'path';
-import { PLATFORMS } from '../app_config';
-import { ExpressErrorResponse, GamePathDetails } from '../types/GenericTypes';
+import { ExpressErrorResponse } from '../types/ExpressTypes';
 
 export const handleCaughtError = (error: ExpressErrorResponse | any, res?: Response) => {
 	if (res) {
@@ -18,30 +17,10 @@ export const handleCaughtError = (error: ExpressErrorResponse | any, res?: Respo
 	}
 };
 
-export const buildGamePaths = (): GamePathDetails[] => {
-	const gamePaths: GamePathDetails[] = [];
-	let currentPath: string;
+export const validDirectory = (filePath: string) =>
+	typeof filePath === 'string' &&
+	filePath.length &&
+	fs.statSync(path.resolve(filePath)).isDirectory();
 
-	const isValidPath = (filePath: string) =>
-		typeof filePath === 'string' && fs.statSync(path.resolve(filePath)).isDirectory();
-
-	// GameCube
-	currentPath = process.env.NINTENDO_GAMECUBE_PATH as string;
-	if (isValidPath(currentPath)) {
-		gamePaths.push({
-			path: path.resolve(currentPath),
-			platform: PLATFORMS.nintendo_gamecube
-		});
-	}
-
-	// Wii
-	currentPath = process.env.NINTENDO_WII_PATH as string;
-	if (isValidPath(currentPath)) {
-		gamePaths.push({
-			path: path.resolve(currentPath),
-			platform: PLATFORMS.nintendo_wii
-		});
-	}
-
-	return gamePaths;
-};
+export const validString = (value: unknown): boolean =>
+	typeof value === 'string' && value !== '';
