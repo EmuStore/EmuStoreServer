@@ -1,27 +1,21 @@
 import crypto from 'crypto';
-import { PC } from '../connectors/prisma';
+import { DB } from '../connectors/sequelize';
 import { RESPONSES } from '../utilities/constants';
 import { handleCaughtError } from '../utilities/functions';
 
 const generateToken = async () => {
-	const prisma = await PC.getClient();
-	if (!prisma) {
-		throw RESPONSES.prisma.connectionError;
+	const sequelize = await DB.getConnection();
+	if (!sequelize) {
+		throw RESPONSES.generic.databaseConnectionError;
 	}
+	const { models } = sequelize;
 
 	const token = crypto.randomBytes(48).toString('base64url');
 
-	await prisma.config.upsert({
-		create: {
-			propertyName: 'token',
-			propertyValue: token
-		},
-		update: {
-			propertyValue: token
-		},
-		where: {
-			propertyName: 'token'
-		}
+	await models.Config.sync({ alter: true });
+	await models.Config.upsert({
+		propertyName: 'token',
+		propertyValue: token
 	});
 
 	// eslint-disable-next-line no-console

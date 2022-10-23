@@ -2,17 +2,18 @@ import { Response } from 'express';
 import fs from 'fs';
 import path from 'path';
 import { PLATFORM_FILE_EXTENSIONS } from '../app_config';
-import { PC } from '../connectors/prisma';
+import { DB } from '../connectors/sequelize';
 import { RESPONSES } from '../utilities/constants';
 import { buildGamePaths } from '../utilities/functions';
 
 export class GameService {
 	public async scanGames(res: Response) {
-		const prisma = await PC.getClient();
-		if (!prisma) {
-			throw RESPONSES.prisma.connectionError;
+		const sequelize = await DB.getConnection();
+		if (!sequelize) {
+			throw RESPONSES.generic.databaseConnectionError;
 		}
-		await prisma.game.deleteMany({});
+		const { models } = sequelize;
+		await models.Game.sync({ force: true });
 		const gamePaths = buildGamePaths();
 		for (let i = 0; i < gamePaths.length; i++) {
 			const gamePathObj = gamePaths[i];
@@ -42,13 +43,11 @@ export class GameService {
 				});
 				if (!validFile) continue;
 				const fileSize = fs.statSync(fullPath).size;
-				await prisma.game.create({
-					data: {
-						name: fileNameWithoutExtension,
-						path: fullPath,
-						platform: gamePathObj.platform,
-						size: fileSize
-					}
+				await models.Game.create({
+					name: fileNameWithoutExtension,
+					path: fullPath,
+					platform: gamePathObj.platform,
+					size: fileSize
 				});
 			}
 		}

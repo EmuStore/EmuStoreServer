@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { PC } from '../connectors/prisma';
+import { DB } from '../connectors/sequelize';
 import { RESPONSES } from './constants';
 import { handleCaughtError } from './functions';
 
@@ -19,11 +19,12 @@ export const validateRequest = () => {
 				throw RESPONSES.auth.invalidAuthorization;
 			}
 			const token = fullToken[1];
-			const prisma = await PC.getClient();
-			if (!prisma) {
-				throw RESPONSES.prisma.connectionError;
+			const sequelize = await DB.getConnection();
+			if (!sequelize) {
+				throw RESPONSES.generic.databaseConnectionError;
 			}
-			const appTokenObj = await prisma.config.findFirst({
+			const { models } = sequelize;
+			const appTokenObj = await models.Config.findOne({
 				where: {
 					propertyName: 'token'
 				}

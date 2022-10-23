@@ -14,15 +14,13 @@ export const RESPONSES = {
 		}
 	},
 	generic: {
+		databaseConnectionError: {
+			status: 500,
+			message: 'Failed to Connect to the Database.'
+		},
 		notFound: {
 			status: 404,
 			message: 'The requested resource was not found.'
-		}
-	},
-	prisma: {
-		connectionError: {
-			status: 500,
-			message: 'Failed to Connect to the Database.'
 		}
 	}
 };

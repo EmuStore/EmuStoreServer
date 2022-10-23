@@ -1,7 +1,17 @@
 {
 	"editor.formatOnSave": true,
 	"editor.defaultFormatter": "esbenp.prettier-vscode",
-	"[prisma]": {
-		"editor.defaultFormatter": "Prisma.prisma"
-	}
+	"editor.codeActionsOnSave": {
+		"source.organizeImports": true
+	},
+	"sqltools.connections": [
+		{
+			"previewLimit": 50,
+			"driver": "SQLite",
+			"name": "EmuStoreServer",
+			"group": "EmuStore",
+			"database": "${workspaceFolder:EmuStoreServer}/src/connectors/db.sqlite"
+		}
+	],
+	"sqltools.useNodeRuntime": true
 }

@@ -1,10 +1,6 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-if (process.env.NODE_ENV !== 'production') {
-	require('./utilities/processListeners');
-}
-
 import compression from 'compression';
 import cors from 'cors';
 import express, {
