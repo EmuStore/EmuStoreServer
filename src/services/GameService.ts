@@ -14,13 +14,13 @@ export class GameService {
 		}
 		const { models } = sequelize;
 		const games = await models.Game.findAll({
-			attributes: ['name', 'platform', 'size']
+			attributes: ['id', 'name', 'fileName', 'platform', 'size']
 		});
 		res.send(games);
 	}
 
 	public async sendGame(req: Request, res: Response) {
-		const { name, platform } = req.body;
+		const { name, platform } = req.query;
 		if (!validString(name)) {
 			throw RESPONSES.game.invalidGameName;
 		}
@@ -87,6 +87,7 @@ export class GameService {
 				const fileSize = fs.statSync(fullPath).size;
 				await models.Game.create({
 					name: fileNameWithoutExtension,
+					fileName: fileName,
 					path: fullPath,
 					platform: gamePathObj.platform,
 					size: fileSize

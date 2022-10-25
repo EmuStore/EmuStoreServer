@@ -4,6 +4,7 @@ import { DataTypes, Model, Optional } from 'sequelize';
 type GameAttributes = {
 	id: number;
 	name: string;
+	fileName: string;
 	path: string;
 	size: number;
 	platform: string;
@@ -19,6 +20,7 @@ export class Game
 {
 	id!: number;
 	name!: string;
+	fileName!: string;
 	path!: string;
 	size!: number;
 	platform!: string;
@@ -32,6 +34,10 @@ export class Game
 				primaryKey: true
 			},
 			name: {
+				type: DataTypes.STRING(999),
+				allowNull: false
+			},
+			fileName: {
 				type: DataTypes.STRING(999),
 				allowNull: false
 			},
